@@ -298,9 +298,12 @@ Your Computer
 **AI-Assisted:** Optional AI-powered categorization for edge cases (privacy-conscious, opt-in)
 
 ### Universal Import
-**PDF:** Supports text-based PDF statements from **any bank** (optimized parsers for HDFC, ICICI, SBI included).
-**CSV:** Generic CSV importer works with **any bank export** or manual spreadsheet. Auto-detects columns.
-**Global:** Works with any currency symbol ($, €, £, ₹, ¥).
+
+**PDF:** Supports text-based PDF statements from **any bank worldwide**. Smart column detection automatically finds date, amount, and description columns.
+
+**CSV:** Generic CSV importer works with **any bank export** or manual spreadsheet. Auto-detects columns (Date, Amount, Description, Debit/Credit).
+
+**Multi-Currency:** Handles any currency format - supports both US/UK style (`1,234.56`) and European style (`1.234,56`). Parses €, $, £, ₹, ¥ symbols automatically.
 
 ---
 

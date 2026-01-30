@@ -164,7 +164,7 @@ class ReportGenerator:
             # Expenses are negative, but we want to show positive magnitude
             if row['total'] < 0:
                 table_data.append([
-                    row['merchant'] or "Unknown",
+                    (row['merchant'][:40] + '...') if row['merchant'] and len(row['merchant']) > 40 else (row['merchant'] or "Unknown"),
                     row['currency'] or 'INR',
                     f"{abs(row['total']/100.0):,.2f}"
                 ])

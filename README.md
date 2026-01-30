@@ -15,8 +15,11 @@ AI: "Your average monthly spending is ₹45,230..."
 You: "Set a ₹10,000 budget for Food"
 AI: "Budget set. You're currently at 68% (₹6,800 spent this month)"
 
-You: "Show me all my subscriptions"
-AI: "Found 4 recurring payments: Netflix (₹499), Spotify (₹119)..."
+You: "Generate a PDF report for last month"
+AI: "Report generated: C:\...\Financial_Report_2026_01.pdf"
+
+You: "Add expense $20 for GitHub Copilot"
+AI: "Added transaction in USD. Converted to base currency for stats."
 ```
 
 ---
@@ -37,6 +40,12 @@ Monthly spending trends, merchant summaries, recurring payment detection
 
 **Full CRUD Operations**  
 Add, edit, delete transactions via conversation. Bulk operations supported.
+
+**Global & Multi-Currency **  
+Support for INR, USD, EUR. 200+ global merchant patterns (Uber, Amazon, Apple, etc.).
+
+**Professional Reporting**  
+Generate beautiful PDF financial reports with charts for monthly reviews.
 
 **Privacy-First Architecture**  
 All data stored locally in SQLite. Zero cloud uploads. No external API calls.
@@ -240,6 +249,7 @@ Or use Python module directly:
 - `find_duplicates` - Find potential duplicate transactions
 - `get_category_trend` - Monthly spending trends for a category
 - `get_merchant_summary` - Top spending merchants
+- `generate_monthly_report` - **NEW** Generate PDF report with charts
 - `smart_categorize_uncategorized` - AI-powered categorization (opt-in)
 
 </details>
@@ -261,7 +271,7 @@ Your Computer
 
 ### Smart Categorization
 
-**Auto-categorization:** 85% of transactions categorized automatically using 80+ merchant patterns
+**Auto-categorization:** 85% of transactions categorized automatically using **200+ global merchant patterns** (including US, UK, EU, India).
 
 **Rule Engine:** Create custom rules with regex patterns. Rules apply retroactively.
 

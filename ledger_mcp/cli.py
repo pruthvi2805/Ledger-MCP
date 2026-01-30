@@ -75,11 +75,19 @@ def ingest(file_path: str, bank: str = "auto", password: Optional[str] = None):
             # Initial Categorization
             category = categorizer.categorize(txn.description)
             
+            # Determine Currency (default to INR if not set)
+            currency = getattr(txn, 'currency', 'INR')
+            
+            # Simple normalization (placeholder rates)
+            exchange_rates = {"INR": 1.0, "USD": 85.0, "EUR": 90.0}
+            rate = exchange_rates.get(currency.upper(), 1.0)
+            amount_normalized = (txn.amount / 100.0) * rate if currency.upper() != "INR" else (txn.amount / 100.0)
+
             try:
                 cursor.execute("""
-                    INSERT INTO transactions (id, date, amount, description, merchant, category, source_file)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (txn_id, txn.date, txn.amount, txn.description, merchant, category, os.path.basename(file_path)))
+                    INSERT INTO transactions (id, date, amount, description, merchant, category, source_file, currency, amount_normalized)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (txn_id, txn.date, txn.amount, txn.description, merchant, category, os.path.basename(file_path), currency, amount_normalized))
                 count += 1
             except Exception:
                 # Ignore duplicates (Primary Key collision on ID)

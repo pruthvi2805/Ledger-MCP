@@ -41,9 +41,25 @@ class Database:
             merchant TEXT,
             category TEXT DEFAULT 'Uncategorized',
             is_recurring BOOLEAN DEFAULT 0,
-            source_file TEXT
+            source_file TEXT,
+            currency TEXT DEFAULT 'INR',
+            amount_normalized REAL
         )
         """)
+
+        # Schema Migration: Add columns if they don't exist (for v1 users)
+        cursor.execute("PRAGMA table_info(transactions)")
+        columns = [info[1] for info in cursor.fetchall()]
+        
+        if 'currency' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN currency TEXT DEFAULT 'INR'")
+            print("Migrated DB: Added 'currency' column")
+            
+        if 'amount_normalized' not in columns:
+            cursor.execute("ALTER TABLE transactions ADD COLUMN amount_normalized REAL")
+            # Populate normalized amount (assuming INR for past txns)
+            cursor.execute("UPDATE transactions SET amount_normalized = amount / 100.0 WHERE amount_normalized IS NULL")
+            print("Migrated DB: Added 'amount_normalized' column")
 
         # Indexes for speed
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_category ON transactions (category)")

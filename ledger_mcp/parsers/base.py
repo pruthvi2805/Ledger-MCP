@@ -10,6 +10,7 @@ class TransactionData:
     description: str
     merchant: Optional[str] = None
     category: str = "Uncategorized"
+    currency: str = "INR"
 
 class BaseParser(ABC):
     @abstractmethod

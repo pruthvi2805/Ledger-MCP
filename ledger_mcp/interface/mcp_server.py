@@ -60,9 +60,10 @@ def search_transactions(keyword: str = None, min_amount: float = None, max_amoun
     ]
 
 @mcp.tool()
-def get_monthly_summary(month: int, year: int) -> Dict[str, float]:
+def get_monthly_summary(month: int, year: int) -> Dict[str, Dict[str, float]]:
     """
-    Get spending summary by category for a specific month.
+    Get spending summary by category and currency for a specific month.
+    Returns: {"Food": {"INR": -5000, "USD": -20}, ...}
     """
     start_date = f"{year}-{month:02d}-01"
     if month == 12:
@@ -73,14 +74,24 @@ def get_monthly_summary(month: int, year: int) -> Dict[str, float]:
     with DB.get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT category, SUM(amount) as total 
+            SELECT category, currency, SUM(amount) as total 
             FROM transactions 
             WHERE date >= ? AND date < ? 
-            GROUP BY category
+            GROUP BY category, currency
         """, (start_date, end_date))
         rows = cursor.fetchall()
         
-    return {row['category']: row['total'] / 100.0 for row in rows}
+    summary = {}
+    for row in rows:
+        cat = row['category']
+        curr = row['currency'] or 'INR'
+        amount = row['total'] / 100.0
+        
+        if cat not in summary:
+            summary[cat] = {}
+        summary[cat][curr] = amount
+        
+    return summary
 
 @mcp.tool()
 def find_recurring() -> List[Dict]:
@@ -253,11 +264,12 @@ def get_all_categories() -> List[str]:
     return all_cats if all_cats else ["No categories defined yet. You can create any category you want!"]
 
 @mcp.tool()
-def add_transaction(date: str, amount: float, description: str, category: str = "Uncategorized", merchant: str = None) -> str:
+def add_transaction(date: str, amount: float, description: str, category: str = "Uncategorized", merchant: str = None, currency: str = "INR") -> str:
     """
     Manually add a transaction (for cash purchases, pending items, or corrections).
     Date format: YYYY-MM-DD
-    Amount: positive for income, negative for expenses (in rupees)
+    Amount: positive for income, negative for expenses (in rupees/dollars/euros)
+    Currency: INR, USD, EUR (default: INR)
     """
     from ledger_mcp.core.security import Security
     import os
@@ -269,16 +281,21 @@ def add_transaction(date: str, amount: float, description: str, category: str = 
     cat = Categorizer()
     if not merchant:
         merchant = cat.normalize(description)
+        
+    # Calculate normalized amount (placeholder rates)
+    exchange_rates = {"INR": 1.0, "USD": 85.0, "EUR": 90.0}
+    rate = exchange_rates.get(currency.upper(), 1.0)
+    amount_normalized = (amount * rate) if currency.upper() != "INR" else amount
     
     with DB.get_connection() as conn:
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                INSERT INTO transactions (id, date, amount, description, merchant, category, source_file)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (txn_id, date, int(amount * 100), description, merchant, category, "manual"))
+                INSERT INTO transactions (id, date, amount, description, merchant, category, source_file, currency, amount_normalized)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (txn_id, date, int(amount * 100), description, merchant, category, "manual", currency.upper(), amount_normalized))
             conn.commit()
-            return f"✓ Added transaction: {description} (₹{amount:.2f}) on {date} → {category}"
+            return f"✓ Added transaction: {description} ({currency} {amount:.2f}) on {date} → {category}"
         except Exception as e:
             return f"Error: Could not add transaction. {str(e)}"
 
@@ -604,6 +621,26 @@ def get_category_trend(category: str, months: int = 6) -> List[Dict]:
         }
         for row in rows
     ]
+
+@mcp.tool()
+def generate_monthly_report(month: int, year: int) -> str:
+    """
+    Generate a professional PDF financial report for a specific month.
+    Includes charts for spending by category, top merchants, and summary.
+    Returns the file path of the generated PDF.
+    """
+    try:
+        from ledger_mcp.core.report_generator import ReportGenerator
+        
+        generator = ReportGenerator()
+        pdf_path = generator.generate_pdf(month, year)
+        
+        return f"✓ Report generated successfully: {pdf_path}\nYou can open this file to view charts and detailed analysis."
+        
+    except ImportError:
+        return "Error: Required libraries (reportlab, matplotlib) are missing. Please install them to use this feature."
+    except Exception as e:
+        return f"Error generating report: {str(e)}"
 
 @mcp.tool()
 def get_merchant_summary(limit: int = 10, start_date: str = None, end_date: str = None) -> List[Dict]:

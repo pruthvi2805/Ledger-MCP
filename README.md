@@ -43,8 +43,7 @@
 - **🖐️ Interactive Mode**: Manually map columns for complex PDF layouts—do it once, apply to all pages.
 - **🤖 Smart Categorization**: Auto-categorizes 85% of transactions using 200+ global merchant patterns (Uber, Amazon, etc.).
 - **💰 Multi-Currency**: Native support for USD, EUR, INR, GBP, and more.
-- **📊 Professional Reporting**: Generate detailed PDF monthly reports with charts and insights.
-- **🛡️ Privacy Architecture**: Zero data exfiltration. No APIs. No tracking.
+- **️ Privacy Architecture**: Zero data exfiltration. No APIs. No tracking.
 
 ---
 
@@ -83,7 +82,7 @@
 
 ## Usage
 
-### 1. Ingesting Bank Statements
+### Ingesting Bank Statements
 
 Ledger MCP supports both automatic and interactive ingestion.
 
@@ -101,13 +100,6 @@ Use this if the automatic parser isn't perfect or misses columns, or for complex
 python -m ledger_mcp.cli ingest "C:\Users\YourName\Downloads\statement.pdf" -i
 ```
 > **Pro Tip:** You only need to map the columns for the first page. When asked, select "Apply to all pages" to process the entire document instantly.
-
-### 2. Generating Reports
-Create a beautiful PDF summary of your month.
-
-```bash
-python -m ledger_mcp.cli report --month 01 --year 2026
-```
 
 ---
 

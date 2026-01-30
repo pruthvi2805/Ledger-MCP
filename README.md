@@ -70,7 +70,8 @@ ledger init
 
 ### Ingest Bank Statements
 
-Supports PDF (HDFC, ICICI, SBI) and CSV formats from any bank.
+Supports CSV or Text-based PDF statements from **any bank**.
+Universal parser automatically detects date, amount, and description columns.
 
 ```bash
 ledger ingest ~/Downloads/statement.pdf

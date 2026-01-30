@@ -279,15 +279,10 @@ Your Computer
 
 **AI-Assisted:** Optional AI-powered categorization for edge cases (privacy-conscious, opt-in)
 
-### Supported Banks
-
-**PDF Parsing:**
-- HDFC Bank
-- ICICI Bank
-- SBI (State Bank of India)
-
-**CSV Import:**
-- Any bank's CSV export (generic parser with auto-column detection)
+### Universal Import
+**PDF:** Supports text-based PDF statements from **any bank** (optimized parsers for HDFC, ICICI, SBI included).
+**CSV:** Generic CSV importer works with **any bank export** or manual spreadsheet. Auto-detects columns.
+**Global:** Works with any currency symbol ($, €, £, ₹, ¥).
 
 ---
 
@@ -353,12 +348,12 @@ Ledger-MCP/
 
 ## Roadmap
 
-- [ ] Additional bank support (Axis, Kotak, IDFC)
-- [ ] Multi-currency support
+- [ ] Additional bank parsers (Axis, Kotak, IDFC)
+- [x] Multi-currency support (EUR, USD, GBP, etc.)
+- [x] Global merchant categorization
+- [x] Professional PDF Reports
 - [ ] Transaction tagging system
-- [ ] Export to CSV/PDF reports
 - [ ] Analytics dashboard (read-only web UI)
-- [ ] Merchant name normalization
 - [ ] Split transaction support
 
 ---

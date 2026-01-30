@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "ledger-mcp"
 version = "0.1.0"
-description = "Local-first CLI & MCP server for personal finance. Optimized for Indian banks (HDFC/ICICI/SBI) and privacy."
+description = "Local-first AI personal finance manager. Universal CSV/PDF import, global currency support, and privacy-first MCP integration."
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]

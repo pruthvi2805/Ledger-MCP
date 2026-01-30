@@ -37,7 +37,7 @@ def init():
     print("Setup complete. Database at:", DB.db_path)
 
 @app.command()
-def ingest(file_path: str, bank: str = "auto", password: Optional[str] = None):
+def ingest(file_path: str, bank: str = "auto", password: Optional[str] = None, interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactively map columns for parsing")):
     """Ingest a bank statement (PDF or CSV)."""
     if not os.path.exists(file_path):
         print(f"Error: File not found: {file_path}")
@@ -49,13 +49,14 @@ def ingest(file_path: str, bank: str = "auto", password: Optional[str] = None):
     if file_path.lower().endswith('.csv'):
         parser = CSVParser()
     elif file_path.lower().endswith('.pdf'):
+        from ledger_mcp.parsers.pdf_parser import PDFParser
         parser = PDFParser()
     else:
         print("Unsupported file format. Use CSV or PDF.")
         raise typer.Exit(code=1)
         
     try:
-        transactions = parser.parse(file_path, password=password)
+        transactions = parser.parse(file_path, password=password, interactive=interactive)
     except Exception as e:
         print(f"Parsing Failed: {e}")
         raise typer.Exit(code=1)

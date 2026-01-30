@@ -14,7 +14,7 @@ class TransactionData:
 
 class BaseParser(ABC):
     @abstractmethod
-    def parse(self, file_path: str, password: Optional[str] = None) -> List[TransactionData]:
+    def parse(self, file_path: str, password: Optional[str] = None, interactive: bool = False) -> List[TransactionData]:
         """
         Parse the file and return a list of TransactionData objects.
         """

@@ -5,7 +5,7 @@ import re
 from .base import BaseParser, TransactionData
 
 class CSVParser(BaseParser):
-    def parse(self, file_path: str, password: Optional[str] = None) -> List[TransactionData]:
+    def parse(self, file_path: str, password: Optional[str] = None, interactive: bool = False) -> List[TransactionData]:
         # Using pandas with python engine for better separator handling if needed
         # Assuming standard csv
         df = pd.read_csv(file_path)

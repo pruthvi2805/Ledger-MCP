@@ -6,7 +6,7 @@ from .base import BaseParser, TransactionData
 # from pdfplumber.password import PDFPasswordError
 
 class PDFParser(BaseParser):
-    def parse(self, file_path: str, password: Optional[str] = None) -> List[TransactionData]:
+    def parse(self, file_path: str, password: Optional[str] = None, interactive: bool = False) -> List[TransactionData]:
         try:
             with pdfplumber.open(file_path, password=password) as pdf:
                 # 1. Detect Bank
@@ -22,7 +22,7 @@ class PDFParser(BaseParser):
                     return self._parse_sbi(pdf)
                 else:
                     print(f"Bank format not recognized. Attempting Universal Parser...")
-                    return self._parse_universal(pdf)
+                    return self._parse_universal(pdf, interactive=interactive)
                     
         except Exception as e:
             if "password" in str(e).lower():
@@ -143,7 +143,7 @@ class PDFParser(BaseParser):
         
         return transactions
 
-    def _parse_universal(self, pdf) -> List[TransactionData]:
+    def _parse_universal(self, pdf, interactive: bool = False) -> List[TransactionData]:
         """
         Universal fallback parser. Scans tables for consistent date/amount pattern.
         """
@@ -154,19 +154,100 @@ class PDFParser(BaseParser):
         # 2. Look for Amount column(s) - Debit/Credit or single Amount
         # 3. Description is usually the longest text column
         
+        # Universal fallback parser with Interactive Mode support
+        transactions = []
+        import typer
+        
+        saved_mapping = None # Format: {'date': i, 'desc': i, 'debit': i, 'credit': i}
+        
         for page in pdf.pages:
             tables = page.extract_tables()
             for table in tables:
                 if not table: continue
-                
+
                 # Analyze Header / First few rows to identify indices
                 date_idx = -1
                 desc_idx = -1
-                amount_indices = [] # Could be multiple (Debit, Credit) or single (Amount)
+                amount_indices = []
                 
-                # --- STRATEGY 1: Header Detection (Priority) ---
-                # Check the first row for specific keywords
-                header_row = [str(cell).lower().strip() for cell in table[0]] if table else []
+                header_row = [str(cell).strip() for cell in table[0]] if table else []
+                
+                # Default detected indices (reset per table)
+                debit_idx = -1
+                credit_idx = -1
+                
+                # --- INTERACTIVE LOGIC ---
+                if interactive:
+                    use_saved = False
+                    if saved_mapping:
+                        # Auto-apply saved mapping
+                        date_idx = saved_mapping['date']
+                        desc_idx = saved_mapping['desc']
+                        debit_idx = saved_mapping.get('debit', -1)
+                        credit_idx = saved_mapping.get('credit', -1)
+                        amount_indices = saved_mapping.get('amount_indices', [])
+                        use_saved = True
+                    else:
+                        print("\n--- Interactive Column Mapping ---")
+                        print("Found columns:")
+                        for i, col in enumerate(header_row):
+                            print(f"[{i}] {col}")
+                        print("----------------------------------")
+                        
+                        if typer.confirm("Do you want to map this table (or subsequent pages)?", default=True):
+                            # Date
+                            while True:
+                                try:
+                                    val = typer.prompt("Which column index is DATE?", default="0", type=int)
+                                    if 0 <= val < len(header_row):
+                                        date_idx = val
+                                        break
+                                except: pass
+                                
+                            # Description
+                            while True:
+                                try:
+                                    val = typer.prompt("Which column index is DESCRIPTION?", default="1", type=int)
+                                    if 0 <= val < len(header_row):
+                                        desc_idx = val
+                                        break
+                                except: pass
+                                
+                            # Amount Mode
+                            mode = typer.prompt("Does this table have (1) Separate Credit/Debit or (2) Single Amount?", default="1")
+                            
+                            if mode == "1":
+                                db_in = typer.prompt("Which column index is DEBIT (Outflow)?", default="-1")
+                                if db_in != "-1": debit_idx = int(db_in)
+                                
+                                cr_in = typer.prompt("Which column index is CREDIT (Inflow/Income)?", default="-1")
+                                if cr_in != "-1": credit_idx = int(cr_in)
+                            else:
+                                amt_in = typer.prompt("Which column index is AMOUNT?", default="-1")
+                                if amt_in != "-1": amount_indices.append(int(amt_in))
+                            
+                            # Ask to save mapping
+                            if typer.confirm("Apply this mapping to ALL remaining tables/pages?", default=True):
+                                saved_mapping = {
+                                    'date': date_idx,
+                                    'desc': desc_idx,
+                                    'debit': debit_idx,
+                                    'credit': credit_idx,
+                                    'amount_indices': amount_indices
+                                }
+                        else:
+                            # User skipped table
+                            continue
+                            
+                    # Override heuristics if interactive (either saved or new) matches were found
+                    if date_idx != -1:
+                        # Logic below handles this using indices
+                        pass
+                        
+                # --- STRATEGY 1: Header Detection (Priority) --- if not interactive or skipped
+                if not interactive:
+                    # Check the first row for specific keywords
+                    header_row_lower = [h.lower() for h in header_row]
                 
                 debit_idx = -1
                 credit_idx = -1

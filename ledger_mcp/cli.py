@@ -111,6 +111,19 @@ def detect_recurring():
     count = categorizer.detect_recurring()
     print(f"Flagged {count} recurring transaction groups.")
 
+@app.command()
+def config(key: str, value: str):
+    """
+    Set configuration values (e.g., base_currency).
+    Usage: ledger config base_currency EUR
+    """
+    with DB.get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)", 
+                      (key.lower(), value.encode('utf-8')))
+        conn.commit()
+    print(f"OK Config updated: {key.lower()} = {value}")
+
 
 @app.command()
 def mcp():

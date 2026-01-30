@@ -32,7 +32,10 @@ GLOBAL_MERCHANTS = {
     "AIR INDIA": "Travel", "INDIGO": "Travel", "VISTARA": "Travel", "SPICEJET": "Travel",
     "IRCTC": "Transport", "TFL": "Transport", "MTA": "Transport", "CLIPPER": "Transport",
     "OYSTER": "Transport", "EUROSTAR": "Travel", "AMTRAK": "Travel", "DEUTSCHE BAHN": "Travel",
+    "OYSTER": "Transport", "EUROSTAR": "Travel", "AMTRAK": "Travel", "DEUTSCHE BAHN": "Travel",
     "NS.NL": "Transport", "NS GROEP": "Transport", "TRANSAVIA": "Travel", "VUELING": "Travel",
+    "PARKING": "Transport", "Q-PARK": "Transport", "P+R": "Transport", "YELLOWBRICK": "Transport",
+    "EASYPARK": "Transport",
     
     # --- Fuel & Petrol Stations (Global) ---
     "SHELL": "Transport", "BP": "Transport", "ESSO": "Transport", "EXXON": "Transport",
@@ -75,6 +78,9 @@ GLOBAL_MERCHANTS = {
     "UBER EATS": "Food", "DOORDASH": "Food", "DELIVEROO": "Food", "GRUBHUB": "Food",
     "POSTMATES": "Food", "JUST EAT": "Food", "FEBO": "Food", "VAPIANO": "Food",
     "PIZZA EXPRESS": "Food", "PAPA JOHN": "Food", "LITTLE CAESARS": "Food",
+    "RESTAURANT": "Food", "DINING": "Food", "BAKERY": "Food", "CAFE": "Food",
+    "ANNAVILAAS": "Food", "SUVAI": "Food", "ANJAPPAR": "Food", "JJ UTRECHT": "Food",
+    "IL POZZO": "Food", "SARAVANA BHAVAN": "Food",
 
     # --- Food & Dining (India Specific) ---
     "SWIGGY": "Food", "ZOMATO": "Food", "BLINKIT": "Groceries", "ZEPTO": "Groceries",
@@ -138,11 +144,14 @@ GLOBAL_MERCHANTS = {
     "PWN": "Utilities", "BRABANT WATER": "Utilities", "OASEN": "Utilities",
     "HILTERMANN": "Insurance", "RING": "Shopping", "BUDGET": "Shopping",
     "FUNDING": "Transfer", "EIGEN": "Transfer", "DIRECT": "Bills",
-    
+    "ICS": "Bills", "BUNQ": "Transfer", "ABN AMRO": "Transfer",
+
     # --- Healthcare ---
     "PHARMACY": "Healthcare", "APOTHEEK": "Healthcare", "DOCTOR": "Healthcare",
     "HOSPITAL": "Healthcare", "ZIEKENHUIS": "Healthcare", "DENTIST": "Healthcare",
     "TANDARTS": "Healthcare", "FYSIO": "Healthcare", "GGZ": "Healthcare",
+    "TREATWELL": "Services", "HAIRDRESSER": "Services", "SALON": "Services",
+    "BARBER": "Services", "KAPPER": "Services", "SPA": "Services",
     
     # --- Fitness & Sports ---
     "GYM": "Fitness", "SPORTSCHOOL": "Fitness", "BASIC FIT": "Fitness",

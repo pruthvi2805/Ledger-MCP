@@ -114,9 +114,26 @@ def detect_recurring():
     print(f"Flagged {count} recurring transaction groups.")
 
 @app.command()
-def report(month: int = typer.Option(..., "--month", "-m", help="Month (1-12)"), 
-           year: int = typer.Option(..., "--year", "-y", help="Year (e.g. 2025)")):
-    """Generate a PDF financial report."""
+def report(month: int, year: int):
+    """
+    Generate a PDF financial report.
+    Usage: report MONTH YEAR
+    Example: report 7 2025
+    """
+    import datetime
+    now = datetime.datetime.now()
+    
+    # Validation logic to replace required options
+    if not month:
+        # Default to previous month
+        month = now.month - 1
+        if month == 0:
+            month = 12
+            if not year: year = now.year - 1
+            
+    if not year:
+        year = now.year
+
     print(f"Generating report for {month}/{year}...")
     
     try:

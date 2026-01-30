@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Ledger MCP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            900: '#14532d',
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050505;
+            color: #e5e5e5;
+        }
+
+        .bg-grid {
+            background-image: linear-gradient(to right, #262626 1px, transparent 1px),
+                linear-gradient(to bottom, #262626 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col relative">
+
+    <!-- Subtle Background Grid -->
+    <div class="fixed inset-0 bg-grid opacity-[0.15] pointer-events-none z-0"></div>
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 bg-black/50 backdrop-blur sticky top-0 z-50 h-14">
+        <div class="max-w-4xl mx-auto px-6 h-full">
+            <div class="flex items-center justify-between h-full">
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                    <div class="w-2 h-2 rounded-full bg-brand-500"></div>
+                    <span class="font-bold font-mono text-gray-200 tracking-tight text-sm">Ledger MCP</span>
+                </a>
+                <a href="index.html" class="text-xs text-gray-500 hover:text-white transition">← Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow relative z-10 py-20">
+        <div class="max-w-3xl mx-auto px-6">
+            <h1 class="text-3xl font-bold text-white mb-2">Privacy Policy</h1>
+            <p class="text-gray-500 text-sm mb-12">Last updated: January 30, 2026</p>
+
+            <div class="space-y-12 text-gray-400 leading-relaxed text-sm">
+
+                <section>
+                    <h2 class="text-xl font-bold text-white mb-4">1. No Data Collection</h2>
+                    <p>
+                        Ledger MCP is designed as a <strong>local-first application</strong>. We do not collect, store,
+                        transmit, or have access to any of your financial data, bank statements, or transaction history.
+                    </p>
+                    <p class="mt-4">
+                        Everything operates on your local machine. Your data never leaves your computer.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-white mb-4">2. Local Storage</h2>
+                    <p>
+                        All processed data is stored in a SQLite database file (<code
+                            class="bg-white/10 px-1 py-0.5 rounded text-gray-300 font-mono text-xs">ledger.db</code>)
+                        located directly on your hard drive. You have full control over this file and can delete it at
+                        any time.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-white mb-4">3. Third-Party Services</h2>
+                    <p>
+                        This software is open source. If you choose to connect it to third-party AI models (like Claude,
+                        OpenAI, or local LLMs) via the Model Context Protocol (MCP), data is sent to those providers
+                        only when you explicitly ask a question.
+                    </p>
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>We do not have access to these interactions.</li>
+                        <li>Please refer to the privacy policies of the respective AI providers you choose to use.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-white mb-4">4. Hosting & Analytics</h2>
+                    <p>
+                        This documentation site is hosted on Cloudflare Pages. Cloudflare may collect basic logs (IP
+                        addresses, user agents) for security and performance analysis. We use no marketing cookies or
+                        tracking pixels.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-white mb-4">5. Contact</h2>
+                    <p>
+                        For any privacy concerns, you can reach out via <a href="https://www.kpruthvi.com/contact"
+                            class="text-brand-500 hover:underline">kpruthvi.com/contact</a>.
+                    </p>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-[#050505] py-8">
+        <div class="max-w-4xl mx-auto px-6 text-center text-xs text-gray-500">
+            <span>&copy; 2026 Pruthvi Kauticwar</span>
+        </div>
+    </footer>
+
+</body>
+
+</html>

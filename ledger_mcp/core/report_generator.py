@@ -99,24 +99,23 @@ class ReportGenerator:
 
         # Executive Summary
         story.append(Paragraph("Executive Summary", styles['Heading2']))
-        # Helper for approximate conversion (consistent with mcp_server)
-        RATES_TO_INR = { "INR": 1.0, "USD": 85.0, "EUR": 92.0, "GBP": 108.0, "JPY": 0.55, "CAD": 63.0, "AUD": 55.0 }
         
-        # Calculate Grand Total in Base Currency
-        grand_total = 0.0
-        base_rate = RATES_TO_INR.get(base_currency, 1.0)
+        # Calculate Grand Total using stored Normalized Amounts (accurate historical rates)
+        with DB.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT SUM(amount_normalized) 
+                FROM transactions 
+                WHERE date >= ? AND date < ?
+            """, (start_date, end_date))
+            row = cursor.fetchone()
+            grand_total = row[0] if row and row[0] else 0.0
         
         summary_text = []
         for curr, amt in total_spent.items():
             summary_text.append(f"• Total Spending ({curr}): {curr} {amt:,.2f}")
             
-            # Convert to base
-            curr_rate = RATES_TO_INR.get(curr, 1.0)
-            # rate_from / rate_to
-            rate = curr_rate / base_rate
-            grand_total += (amt * rate)
-            
-        summary_text.insert(0, f"<b>Grand Total ({base_currency}): {base_currency} {grand_total:,.2f}</b>")
+        summary_text.insert(0, f"<b>Grand Total ({base_currency}): {base_currency} {abs(grand_total):,.2f}</b>")
         summary_text.insert(1, "") # Spacer
         
         if not total_spent:

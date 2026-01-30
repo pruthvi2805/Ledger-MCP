@@ -15,11 +15,11 @@ AI: "Your average monthly spending is ₹45,230..."
 You: "Set a ₹10,000 budget for Food"
 AI: "Budget set. You're currently at 68% (₹6,800 spent this month)"
 
-You: "Set base currency to EUR"
-AI: "Done. All future reports will now be in EUR."
+You: "Add expense $20 for GitHub Copilot"
+AI: "Since your base currency is EUR, what is the current USD to EUR exchange rate?"
+You: "It's 0.92"
+AI: "Added transaction. Amount: $20 (Normalized: €18.40)"
 
-You: "Generate a PDF report for last month"
-AI: "Report generated! Grand Total: €1,240.50"
 
 ```
 

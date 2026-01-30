@@ -290,37 +290,24 @@ def _get_base_currency() -> str:
             return row['value'].decode('utf-8')
     return "INR"
 
-def _get_exchange_rate(from_curr: str, to_curr: str) -> float:
-    # Base rates relative to INR (approximate/static for v1)
-    # In a real app, fetch live rates
-    RATES_TO_INR = {
-        "INR": 1.0,
-        "USD": 85.0,
-        "EUR": 92.0,
-        "GBP": 108.0,
-        "JPY": 0.55,
-        "CAD": 63.0,
-        "AUD": 55.0
-    }
-    
-    rate_from = RATES_TO_INR.get(from_curr.upper(), 1.0)
-    rate_to = RATES_TO_INR.get(to_curr.upper(), 1.0)
-    
-    return rate_from / rate_to
-
 @mcp.tool()
-def add_transaction(date: str, amount: float, description: str, category: str = "Uncategorized", merchant: str = None, currency: str = None) -> str:
+def add_transaction(date: str, amount: float, description: str, category: str = "Uncategorized", merchant: str = None, currency: str = None, exchange_rate: float = None) -> str:
     """
     Manually add a transaction.
     date: YYYY-MM-DD
-    amount: positive/negative
+    amount: positive/negative (in the transaction currency)
     currency: ISO code (defaults to System Base Currency if not provided)
+    exchange_rate: (Optional) Rate to convert to Base Currency. Required if currency != base.
     """
     from ledger_mcp.core.security import Security
     
     base_currency = _get_base_currency()
     txn_currency = currency.upper() if currency else base_currency
     
+    # 1. Validation: Require Exchange Rate for Foreign Currencies
+    if txn_currency != base_currency and exchange_rate is None:
+        return f"Error: Transaction is in {txn_currency} but Base Currency is {base_currency}. Please provide `exchange_rate` (Rate: 1 {txn_currency} = X {base_currency}) or convert the amount manually."
+
     # Generate unique ID
     txn_id = Security.generate_transaction_id(date, int(amount * 100), description, "manual_entry")
     
@@ -329,9 +316,12 @@ def add_transaction(date: str, amount: float, description: str, category: str = 
     if not merchant:
         merchant = cat.normalize(description)
         
-    # Calculate normalized amount (convert txn_currency -> base_currency)
-    rate = _get_exchange_rate(txn_currency, base_currency)
-    amount_normalized = amount * rate
+    # 2. Calculate Normalized Amount
+    if txn_currency == base_currency:
+        amount_normalized = amount
+    else:
+        # Use provided realtime rate
+        amount_normalized = amount * exchange_rate
     
     with DB.get_connection() as conn:
         cursor = conn.cursor()
@@ -341,7 +331,7 @@ def add_transaction(date: str, amount: float, description: str, category: str = 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (txn_id, date, int(amount * 100), description, merchant, category, "manual", txn_currency, amount_normalized))
             conn.commit()
-            return f"✓ Added transaction: {description} ({txn_currency} {amount:.2f}) → Normalized: {base_currency} {amount_normalized:.2f}"
+            return f"✓ Added transaction: {description} ({txn_currency} {amount:.2f}) → Normalized: {base_currency} {amount_normalized:.2f} (Rate: {exchange_rate or 1.0})"
         except Exception as e:
             return f"Error: Could not add transaction. {str(e)}"
 

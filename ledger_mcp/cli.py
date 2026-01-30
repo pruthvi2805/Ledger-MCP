@@ -78,10 +78,11 @@ def ingest(file_path: str, bank: str = "auto", password: Optional[str] = None):
             # Determine Currency (default to INR if not set)
             currency = getattr(txn, 'currency', 'INR')
             
-            # Simple normalization (placeholder rates)
-            exchange_rates = {"INR": 1.0, "USD": 85.0, "EUR": 90.0}
-            rate = exchange_rates.get(currency.upper(), 1.0)
-            amount_normalized = (txn.amount / 100.0) * rate if currency.upper() != "INR" else (txn.amount / 100.0)
+            # TODO: Add CLI argument for exchange rate or fetch from DB
+            # For now, we avoid hardcoding rates as per user request. 
+            # Normalized amount defaults to raw amount (assuming 1:1 if unknown).
+            # User can update normalization later via MCP tools.
+            amount_normalized = txn.amount / 100.0
 
             try:
                 cursor.execute("""

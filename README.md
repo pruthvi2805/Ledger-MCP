@@ -14,14 +14,16 @@ AI: "Your average monthly spending is ₹45,230..."
 
 You: "Set a ₹10,000 budget for Food"
 AI: "Budget set. You're currently at 68% (₹6,800 spent this month)"
-
-You: "Add expense $20 for GitHub Copilot"
-AI: "Since your base currency is EUR, what is the current USD to EUR exchange rate?"
-You: "It's 0.92"
-AI: "Added transaction. Amount: $20 (Normalized: €18.40)"
-
-
 ```
+
+### Why Ledger MCP?
+
+Most finance apps require you to upload your sensitive bank statements to their cloud. **Ledger MCP is different.**
+
+- **🔒 100% Local Storage:** Your financial data lives in a standard SQLite database on *your* disk.
+- **🚫 No Cloud Uploads:** We never see your data. No servers. No APIs.
+- **🛑 No Bank Logins:** We parse your PDF/CSV statements locally. No giving away your banking passwords.
+- **🤖 Private AI:** Works with local LLMs (via Ollama) or standard AI desktops, but the data retrieval happens strictly on your machine.
 
 ---
 
@@ -49,7 +51,7 @@ Support for INR, USD, EUR. 200+ global merchant patterns (Uber, Amazon, Apple, e
 Generate beautiful PDF financial reports with charts for monthly reviews.
 
 **Privacy-First Architecture**  
-All data stored locally in SQLite. Zero cloud uploads. No external API calls.
+Built from the ground up for security. Your financial life stays on your laptop, not our servers.
 
 ---
 

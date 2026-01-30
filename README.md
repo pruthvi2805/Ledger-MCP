@@ -89,14 +89,21 @@ python -m ledger_mcp.cli init
 ### Ingest Bank Statements
 
 Supports CSV or Text-based PDF statements from **any bank**.
-Universal parser automatically detects date, amount, and description columns.
+The Universal Parser automatically detects date, amount, and description columns.
 
+**Option 1: Automatic Ingestion**
 ```bash
-python -m ledger_mcp.cli ingest ~/Downloads/statement.pdf
-# Successfully ingested 150 transactions
+python -m ledger_mcp.cli ingest "C:\Users\YourName\Downloads\statement.pdf"
 ```
 
-> **Note:** If the `ledger` command is not found, use `python -m ledger_mcp.cli` instead.
+**Option 2: Interactive Mode (Recommended for new formats)**
+If the automatic parser isn't perfect or misses columns, use the `-i` flag.
+This allows you to manually identify the Date, Description, and Amount columns.
+
+```bash
+python -m ledger_mcp.cli ingest "C:\Users\YourName\Downloads\statement.pdf" -i
+```
+> **Tip:** You only need to map the columns for the first page. The tool will ask if you want to "Apply to all pages", allowing you to process large statements instantly.
 
 ### Connect to AI
 

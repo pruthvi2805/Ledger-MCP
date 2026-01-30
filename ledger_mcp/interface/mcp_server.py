@@ -795,6 +795,74 @@ To use AI categorization:
 Note: This is a privacy-conscious approach - YOU control when to share data with AI.
 """
 
+@mcp.tool()
+def get_financial_health(month: int, year: int) -> str:
+    """
+    Get a financial health dashboard: Income, Burn (True Expenses), and Savings Rate.
+    Crucially, this separates 'Transfers' (money moved to savings/investments) from 'Burn'.
+    
+    Formula:
+    - Income: Sum of all positive inflows
+    - Burn: Total Outflows - Transfers/Investments
+    - Savings: Income - Burn
+    - Savings Rate: (Savings / Income) * 100
+    """
+    start_date = f"{year}-{month:02d}-01"
+    if month == 12:
+        end_date = f"{year+1}-01-01"
+    else:
+        end_date = f"{year}-{month+1:02d}-01"
+
+    currency = _get_base_currency()
+    
+    with DB.get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT category, amount 
+            FROM transactions 
+            WHERE date >= ? AND date < ?
+        """, (start_date, end_date))
+        rows = cursor.fetchall()
+        
+    income = 0.0
+    total_outflow = 0.0
+    transfers = 0.0
+    
+    savings_categories = {'Transfer', 'Investment', 'Savings', 'Save'}
+    
+    for row in rows:
+        amount = row['amount'] / 100.0
+        cat = row['category']
+        
+        if amount > 0:
+            income += amount
+        else:
+            abs_amount = abs(amount)
+            total_outflow += abs_amount
+            if cat in savings_categories:
+                transfers += abs_amount
+                
+    burn = total_outflow - transfers
+    savings = income - burn
+    
+    if income > 0:
+        rate = (savings / income) * 100
+    else:
+        rate = 0.0
+        
+    return f"""
+Financial Health for {year}-{month:02d} ({currency}):
+
+💰 Income:    {income:,.2f}
+🔥 Burn:      {burn:,.2f} (True Spending)
+🏦 Saved:     {savings:,.2f} (Unspent + Transfers)
+📈 Rate:      {rate:.1f}%
+
+Details:
+- Total Outflows: {total_outflow:,.2f}
+- Transfers/Investments: {transfers:,.2f} (Excluded from Burn)
+"""
+
 def start_mcp():
     """Entry point for CLI to start MCP."""
     mcp.run()

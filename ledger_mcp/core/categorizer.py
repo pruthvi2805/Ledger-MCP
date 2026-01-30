@@ -20,8 +20,11 @@ class Categorizer:
         """Uppercase, clean prefixes, collapse whitespace."""
         if not text: return ""
         text = text.upper()
-        # Remove common bank prefixes
+        # Remove common bank/payment prefixes
+        # e.g. "BEA, Apple Pay ...", "SEPA Incasso ...", "eCom, Apple Pay ..."
         text = re.sub(r'^(UPI-|POS-|NEFT-|IMPS-|ACH-)', '', text)
+        text = re.sub(r'^(BEA,?\s*|SEPA\s+|ECOM,?\s*|APPLE PAY\s*|GOOGLE PAY\s*|ALIPAY\s*|PAYPAL\s*)+', '', text, flags=re.IGNORECASE)
+        
         text = re.sub(r'\s+', ' ', text).strip()
         return text
 

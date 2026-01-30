@@ -164,43 +164,76 @@ class PDFParser(BaseParser):
                 desc_idx = -1
                 amount_indices = [] # Could be multiple (Debit, Credit) or single (Amount)
                 
-                # Check first 5 rows to find date column
-                for col_idx in range(len(table[0])):
-                    matches = 0
-                    for row in table[:10]: # Check first 10 rows
-                        if col_idx < len(row) and self._parse_date(row[col_idx]):
-                            matches += 1
-                    if matches >= 3: # If at least 3 rows have dates in this column, it's the date col
-                        date_idx = col_idx
-                        break
+                # --- STRATEGY 1: Header Detection (Priority) ---
+                # Check the first row for specific keywords
+                header_row = [str(cell).lower().strip() for cell in table[0]] if table else []
                 
-                if date_idx == -1: continue # No date column found, skip table
+                debit_idx = -1
+                credit_idx = -1
                 
-                # Identify other columns based on heuristics
-                # Identify numeric columns
-                numeric_cols = []
-                for col_idx in range(len(table[0])):
-                     if col_idx == date_idx: continue
-                     is_numeric = 0
-                     for row in table[:10]:
-                         if col_idx < len(row) and self._is_numeric(row[col_idx]):
-                             is_numeric += 1
-                     if is_numeric >= 3:
-                         numeric_cols.append(col_idx)
+                # Check headers
+                for i, col in enumerate(header_row):
+                    if any(k in col for k in ['date', 'datum']):
+                        date_idx = i
+                    elif any(k in col for k in ['description', 'omschrijving', 'narration', 'particulars']):
+                        desc_idx = i
+                    elif any(k in col for k in ['amount credited', 'credit', 'bij', 'deposit']):
+                        credit_idx = i
+                    elif any(k in col for k in ['amount debited', 'debit', 'af', 'withdrawal']):
+                        debit_idx = i
+                    elif 'amount' in col or 'bedrag' in col:
+                        # Fallback if no specific deb/cred
+                        amount_indices.append(i)
 
-                amount_indices = numeric_cols
+                # If we found explicit Debit/Credit columns via headers, use them
+                if credit_idx != -1 or debit_idx != -1:
+                    if credit_idx != -1: amount_indices.append(credit_idx)
+                    if debit_idx != -1: amount_indices.append(debit_idx)
+                    # Ensure date/desc were found, else fallback to heuristics for them
                 
-                # Description: Longest average length column that is not Date or Amount
-                max_len = 0
-                for col_idx in range(len(table[0])):
-                    if col_idx == date_idx or col_idx in amount_indices: continue
-                    avg_len = sum([len(str(r[col_idx])) for r in table[:10] if col_idx < len(r)]) / 10
-                    if avg_len > max_len:
-                        max_len = avg_len
-                        desc_idx = col_idx
+                # --- STRATEGY 2: Heuristic Detection (Fallback) ---
+                if date_idx == -1:
+                    # Check first 5 rows to find date column
+                    for col_idx in range(len(table[0])):
+                        matches = 0
+                        for row in table[:10]: # Check first 10 rows
+                            if col_idx < len(row) and self._parse_date(row[col_idx]):
+                                matches += 1
+                        if matches >= 3: 
+                            date_idx = col_idx
+                            break
+                
+                if date_idx == -1: continue # No date parsing possible
+                
+                # If amounts not found via headers, use numeric heuristic
+                if not amount_indices:
+                    numeric_cols = []
+                    for col_idx in range(len(table[0])):
+                         if col_idx == date_idx: continue
+                         is_numeric = 0
+                         for row in table[:10]:
+                             if col_idx < len(row) and self._is_numeric(row[col_idx]):
+                                 is_numeric += 1
+                         if is_numeric >= 3:
+                             numeric_cols.append(col_idx)
+                    amount_indices = numeric_cols
+
+                # Description: Longest average length column
+                if desc_idx == -1:
+                    max_len = 0
+                    for col_idx in range(len(table[0])):
+                        if col_idx == date_idx or col_idx in amount_indices: continue
+                        avg_len = sum([len(str(r[col_idx])) for r in table[:10] if col_idx < len(r)]) / 10
+                        if avg_len > max_len:
+                            max_len = avg_len
+                            desc_idx = col_idx
 
                 # Parse rows with identified indices
-                for row in table:
+                for row_idx, row in enumerate(table):
+                    # Skip header row if it contains text like "Date"
+                    if row_idx == 0 and date_idx != -1 and "date" in str(row[date_idx]).lower():
+                        continue
+                        
                     if len(row) <= max(date_idx, desc_idx, max(amount_indices) if amount_indices else 0): continue
                     
                     date_str = self._parse_date(row[date_idx])
@@ -209,11 +242,25 @@ class PDFParser(BaseParser):
                     desc = row[desc_idx] if desc_idx != -1 else "Unknown Transaction"
                     
                     # Determine amount logic
-                    # If 2 numeric cols: Assume Debit, Credit
-                    # If 1 numeric col: Assume +/- Amount or just Amount
                     amount = 0.0
                     
-                    if len(amount_indices) >= 2:
+                    # Explicit Header-based Logic
+                    if debit_idx != -1 or credit_idx != -1:
+                        d_val = 0.0
+                        c_val = 0.0
+                        
+                        if debit_idx != -1 and debit_idx < len(row):
+                            d_val = self._parse_amount(row[debit_idx])
+                        if credit_idx != -1 and credit_idx < len(row):
+                            c_val = self._parse_amount(row[credit_idx])
+                            
+                        if d_val > 0: amount = -d_val
+                        elif c_val > 0: amount = c_val
+                        # Note: d_val might be negative if parser returned negative, handle abs
+                        # Actually _parse_amount returns +/- based on CR/DR text, but raw numbers are positive
+                        # Let's trust _parse_amount returns positive for numbers usually.
+                    
+                    elif len(amount_indices) >= 2:
                         debit = self._parse_amount(row[amount_indices[0]])
                         credit = self._parse_amount(row[amount_indices[1]])
                         if debit > 0: amount = -debit

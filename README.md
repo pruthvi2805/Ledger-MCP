@@ -15,11 +15,12 @@ AI: "Your average monthly spending is ₹45,230..."
 You: "Set a ₹10,000 budget for Food"
 AI: "Budget set. You're currently at 68% (₹6,800 spent this month)"
 
-You: "Generate a PDF report for last month"
-AI: "Report generated: C:\...\Financial_Report_2026_01.pdf"
+You: "Set base currency to EUR"
+AI: "Done. All future reports will now be in EUR."
 
-You: "Add expense $20 for GitHub Copilot"
-AI: "Added transaction in USD. Converted to base currency for stats."
+You: "Generate a PDF report for last month"
+AI: "Report generated! Grand Total: €1,240.50"
+
 ```
 
 ---
@@ -243,6 +244,7 @@ Or use Python module directly:
 ### Budget Management
 - `set_budget` - Set monthly budget limits
 - `get_budget_status` - Check budget vs actual spending
+- `set_base_currency` - **NEW** Set primary currency (INR, USD, EUR, etc.)
 
 ### Analysis & Trends
 - `find_recurring` - Detect subscriptions automatically

@@ -36,6 +36,11 @@ class ReportGenerator:
         with DB.get_connection() as conn:
             cursor = conn.cursor()
             
+            # Get Base Currency
+            cursor.execute("SELECT value FROM config WHERE key='base_currency'")
+            row = cursor.fetchone()
+            base_currency = row['value'].decode('utf-8') if row and row['value'] else 'INR'
+            
             # Summary by Category & Currency
             cursor.execute("""
                 SELECT category, currency, SUM(amount) as total 
@@ -94,11 +99,27 @@ class ReportGenerator:
 
         # Executive Summary
         story.append(Paragraph("Executive Summary", styles['Heading2']))
+        # Helper for approximate conversion (consistent with mcp_server)
+        RATES_TO_INR = { "INR": 1.0, "USD": 85.0, "EUR": 92.0, "GBP": 108.0, "JPY": 0.55, "CAD": 63.0, "AUD": 55.0 }
+        
+        # Calculate Grand Total in Base Currency
+        grand_total = 0.0
+        base_rate = RATES_TO_INR.get(base_currency, 1.0)
+        
         summary_text = []
         for curr, amt in total_spent.items():
-            summary_text.append(f"Total Spending ({curr}): {curr} {amt:,.2f}")
+            summary_text.append(f"• Total Spending ({curr}): {curr} {amt:,.2f}")
+            
+            # Convert to base
+            curr_rate = RATES_TO_INR.get(curr, 1.0)
+            # rate_from / rate_to
+            rate = curr_rate / base_rate
+            grand_total += (amt * rate)
+            
+        summary_text.insert(0, f"<b>Grand Total ({base_currency}): {base_currency} {grand_total:,.2f}</b>")
+        summary_text.insert(1, "") # Spacer
         
-        if not summary_text:
+        if not total_spent:
             story.append(Paragraph("No spending data found for this month.", styles['Normal']))
             doc.build(story)
             return output_path
@@ -107,8 +128,8 @@ class ReportGenerator:
         story.append(Spacer(1, 0.2*inch))
 
         # Charts Generation
-        # Pie Chart (Top Categories in primary currency - defaulting to INR or USD)
-        primary_curr = "INR" if "INR" in total_spent else list(total_spent.keys())[0]
+        # Pie Chart (Top Categories in primary currency)
+        primary_curr = base_currency
         
         pie_data = []
         pie_labels = []

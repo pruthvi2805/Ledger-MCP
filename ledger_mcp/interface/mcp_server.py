@@ -264,15 +264,62 @@ def get_all_categories() -> List[str]:
     return all_cats if all_cats else ["No categories defined yet. You can create any category you want!"]
 
 @mcp.tool()
-def add_transaction(date: str, amount: float, description: str, category: str = "Uncategorized", merchant: str = None, currency: str = "INR") -> str:
+def set_base_currency(currency: str) -> str:
     """
-    Manually add a transaction (for cash purchases, pending items, or corrections).
-    Date format: YYYY-MM-DD
-    Amount: positive for income, negative for expenses (in rupees/dollars/euros)
-    Currency: INR, USD, EUR (default: INR)
+    Set the primary currency for reporting and normalization (e.g., 'EUR', 'USD', 'INR').
+    Default is 'INR'. verified against supported currencies.
+    """
+    supported = ["INR", "USD", "EUR", "GBP", "JPY", "CAD", "AUD"]
+    if currency.upper() not in supported:
+        return f"Error: Currency '{currency}' not supported. Use one of: {', '.join(supported)}"
+        
+    with DB.get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)", 
+                      ('base_currency', currency.upper().encode('utf-8')))
+        conn.commit()
+    
+    return f"✓ Base currency set to {currency.upper()}. Future reports will use this as the primary currency."
+
+def _get_base_currency() -> str:
+    with DB.get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM config WHERE key='base_currency'")
+        row = cursor.fetchone()
+        if row and row['value']:
+            return row['value'].decode('utf-8')
+    return "INR"
+
+def _get_exchange_rate(from_curr: str, to_curr: str) -> float:
+    # Base rates relative to INR (approximate/static for v1)
+    # In a real app, fetch live rates
+    RATES_TO_INR = {
+        "INR": 1.0,
+        "USD": 85.0,
+        "EUR": 92.0,
+        "GBP": 108.0,
+        "JPY": 0.55,
+        "CAD": 63.0,
+        "AUD": 55.0
+    }
+    
+    rate_from = RATES_TO_INR.get(from_curr.upper(), 1.0)
+    rate_to = RATES_TO_INR.get(to_curr.upper(), 1.0)
+    
+    return rate_from / rate_to
+
+@mcp.tool()
+def add_transaction(date: str, amount: float, description: str, category: str = "Uncategorized", merchant: str = None, currency: str = None) -> str:
+    """
+    Manually add a transaction.
+    date: YYYY-MM-DD
+    amount: positive/negative
+    currency: ISO code (defaults to System Base Currency if not provided)
     """
     from ledger_mcp.core.security import Security
-    import os
+    
+    base_currency = _get_base_currency()
+    txn_currency = currency.upper() if currency else base_currency
     
     # Generate unique ID
     txn_id = Security.generate_transaction_id(date, int(amount * 100), description, "manual_entry")
@@ -282,10 +329,9 @@ def add_transaction(date: str, amount: float, description: str, category: str = 
     if not merchant:
         merchant = cat.normalize(description)
         
-    # Calculate normalized amount (placeholder rates)
-    exchange_rates = {"INR": 1.0, "USD": 85.0, "EUR": 90.0}
-    rate = exchange_rates.get(currency.upper(), 1.0)
-    amount_normalized = (amount * rate) if currency.upper() != "INR" else amount
+    # Calculate normalized amount (convert txn_currency -> base_currency)
+    rate = _get_exchange_rate(txn_currency, base_currency)
+    amount_normalized = amount * rate
     
     with DB.get_connection() as conn:
         cursor = conn.cursor()
@@ -293,9 +339,9 @@ def add_transaction(date: str, amount: float, description: str, category: str = 
             cursor.execute("""
                 INSERT INTO transactions (id, date, amount, description, merchant, category, source_file, currency, amount_normalized)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (txn_id, date, int(amount * 100), description, merchant, category, "manual", currency.upper(), amount_normalized))
+            """, (txn_id, date, int(amount * 100), description, merchant, category, "manual", txn_currency, amount_normalized))
             conn.commit()
-            return f"✓ Added transaction: {description} ({currency} {amount:.2f}) on {date} → {category}"
+            return f"✓ Added transaction: {description} ({txn_currency} {amount:.2f}) → Normalized: {base_currency} {amount_normalized:.2f}"
         except Exception as e:
             return f"Error: Could not add transaction. {str(e)}"
 

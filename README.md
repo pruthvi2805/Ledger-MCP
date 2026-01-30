@@ -79,8 +79,11 @@ Requires Python 3.10+
 ```bash
 git clone https://github.com/pruthvi2805/Ledger-MCP
 cd Ledger-MCP
-pip install -e .
-ledger init
+# Install in editable mode
+python -m pip install -e .
+
+# Initialize the database
+python -m ledger_mcp.cli init
 ```
 
 ### Ingest Bank Statements
@@ -89,9 +92,11 @@ Supports CSV or Text-based PDF statements from **any bank**.
 Universal parser automatically detects date, amount, and description columns.
 
 ```bash
-ledger ingest ~/Downloads/statement.pdf
+python -m ledger_mcp.cli ingest ~/Downloads/statement.pdf
 # Successfully ingested 150 transactions
 ```
+
+> **Note:** If the `ledger` command is not found, use `python -m ledger_mcp.cli` instead.
 
 ### Connect to AI
 
@@ -107,8 +112,8 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "ledger": {
-      "command": "ledger",
-      "args": ["mcp"]
+      "command": "python",
+      "args": ["-m", "ledger_mcp.cli", "mcp"]
     }
   }
 }
@@ -130,8 +135,8 @@ Add to `cline_mcp_settings.json`:
 {
   "mcpServers": {
     "ledger": {
-      "command": "ledger",
-      "args": ["mcp"]
+      "command": "python",
+      "args": ["-m", "ledger_mcp.cli", "mcp"]
     }
   }
 }
@@ -153,8 +158,8 @@ Add to `cline_mcp_settings.json`:
 {
   "mcpServers": {
     "ledger": {
-      "command": "ledger",
-      "args": ["mcp"]
+      "command": "python",
+      "args": ["-m", "ledger_mcp.cli", "mcp"]
     }
   }
 }

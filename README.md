@@ -1,10 +1,25 @@
-# Ledger MCP
+<div align="center">
 
-> Privacy-first financial management for AI assistants via Model Context Protocol
+```
+██╗     ███████╗██████╗  ██████╗ ███████╗██████╗     ███╗   ███╗ ██████╗██████╗ 
+██║     ██╔════╝██╔══██╗██╔════╝ ██╔════╝██╔══██╗    ████╗ ████║██╔════╝██╔══██╗
+██║     █████╗  ██║  ██║██║  ███╗█████╗  ██████╔╝    ██╔████╔██║██║     ██████╔╝
+██║     ██╔══╝  ██║  ██║██║   ██║██╔══╝  ██╔══██╗    ██║╚██╔╝██║██║     ██╔═══╝ 
+███████╗███████╗██████╔╝╚██████╔╝███████╗██║  ██║    ██║ ╚═╝ ██║╚██████╗██║     
+╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚═╝     ╚═╝ ╚═════╝╚═╝     
+```
+
+### 🔒 Privacy-First Financial Management for AI Assistants
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-36%20passing-brightgreen.svg)]()
+
+**Part of [kpruthvi.com](https://kpruthvi.com) developer tools**
+
+</div>
+
+---
 
 **Ledger MCP** transforms your bank statements into conversational financial insights. Ask questions, set budgets, and analyze spending patterns through natural language—all while keeping your data 100% local.
 
@@ -361,6 +376,20 @@ Ledger-MCP/
 
 ---
 
+## 📊 Ledger MCP vs. Alternatives
+
+| Feature | Ledger MCP | Mint/RocketMoney | Spreadsheets |
+|---------|------------|------------------|---------------|
+| **Privacy** | ✅ 100% local | ❌ Cloud servers | ✅ Local |
+| **Bank Login** | ✅ Not needed | ❌ Required | ✅ Not needed |
+| **AI Powered** | ✅ Natural language | ❌ Menu-based | ❌ Manual |
+| **Multi-Currency** | ✅ EUR/USD/INR | ⚠️ Limited | ❌ Manual |
+| **Auto-Categorize** | ✅ 200+ patterns | ✅ Yes | ❌ Manual |
+| **Open Source** | ✅ MIT Licensed | ❌ Proprietary | N/A |
+| **Cost** | ✅ Free forever | ⚠️ Subscription | ✅ Free |
+
+---
+
 ## Contributing
 
 Contributions welcome! Please open an issue or submit a pull request.
@@ -373,14 +402,35 @@ MIT License - see LICENSE file for details
 
 ---
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-Built with [FastMCP](https://github.com/jlowin/fastmcp) by Marvin AI team.
+**Built with care by [Pruthvi Kauticwar](https://kpruthvi.com)**
 
-Inspired by the need for privacy-first financial tools in the age of AI assistants.
+Inspired by the frustration of:
+- Uploading bank statements to sketchy online tools
+- Sharing banking passwords with aggregator apps
+- Privacy policies that read like dystopian fiction
+
+Ledger MCP exists because your financial data should stay **yours**.
 
 ---
 
-**Questions?** Open an issue on GitHub.
+<div align="center">
 
-**Privacy Concerns?** All data stays on your machine. Review the source code—it's open source.
+## 🚀 Ready to Try It?
+
+<sub>No cloud. No tracking. Just insights.</sub>
+
+---
+
+**⭐ Star this repo if you find it useful!**
+
+Made for developers who value privacy 🔒
+
+[![GitHub stars](https://img.shields.io/github/stars/pruthvi2805/Ledger-MCP?style=social)](https://github.com/pruthvi2805/Ledger-MCP/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/pruthvi2805/Ledger-MCP?style=social)](https://github.com/pruthvi2805/Ledger-MCP/network/members)
+
+**More tools at [kpruthvi.com](https://kpruthvi.com)**
+
+</div>
+

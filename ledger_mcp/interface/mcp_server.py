@@ -160,7 +160,7 @@ def get_budget_status(month: int, year: int) -> str:
             status = "OK"
             percent = (abs(spent) / abs(limit) * 100) if limit != 0 else 0
         
-        report.append(f"{cat}: Spent ₹{abs(spent):.2f} / Limit ₹{abs(limit):.2f} ({percent:.0f}%) - {status}")
+        report.append(f"{cat}: Spent {abs(spent):.2f} / Limit {abs(limit):.2f} ({percent:.0f}%) - {status}")
         
     return "\n".join(report)
 
@@ -181,7 +181,7 @@ def add_rule(pattern: str, category: str) -> str:
     cat = Categorizer()
     updated = cat.recategorize_all()
         
-    return f"Rule added: '{pattern}' → '{category}'. Auto-updated {updated} transactions."
+    return f"Rule added: '{pattern}' -> '{category}'. Auto-updated {updated} transactions."
 
 @mcp.tool()
 def categorize_transaction(transaction_id: str, category: str, create_rule: bool = False) -> str:
@@ -217,9 +217,9 @@ def categorize_transaction(transaction_id: str, category: str, create_rule: bool
         conn.commit()
     
     if create_rule:
-        return f"✓ Categorized '{description}' as '{category}' and created a rule for similar transactions."
+        return f"OK: Categorized '{description}' as '{category}' and created a rule for similar transactions."
     else:
-        return f"✓ Categorized '{description}' as '{category}' (one-time only)."
+        return f"OK: Categorized '{description}' as '{category}' (one-time only)."
 
 @mcp.tool()
 def get_uncategorized(limit: int = 20) -> List[Dict]:
@@ -287,7 +287,7 @@ def set_base_currency(currency: str) -> str:
                       ('base_currency', currency.upper().encode('utf-8')))
         conn.commit()
     
-    return f"✓ Base currency set to {currency.upper()}. Future reports will use this as the primary currency."
+    return f"OK: Base currency set to {currency.upper()}. Future reports will use this as the primary currency."
 
 def _get_base_currency() -> str:
     with DB.get_connection() as conn:
@@ -339,7 +339,7 @@ def add_transaction(date: str, amount: float, description: str, category: str = 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (txn_id, date, int(amount * 100), description, merchant, category, "manual", txn_currency, amount_normalized))
             conn.commit()
-            return f"✓ Added transaction: {description} ({txn_currency} {amount:.2f}) → Normalized: {base_currency} {amount_normalized:.2f} (Rate: {exchange_rate or 1.0})"
+            return f"OK: Added transaction: {description} ({txn_currency} {amount:.2f}) -> Normalized: {base_currency} {amount_normalized:.2f} (Rate: {exchange_rate or 1.0})"
         except Exception as e:
             return f"Error: Could not add transaction. {str(e)}"
 
@@ -384,7 +384,7 @@ def update_transaction(transaction_id: str, category: str = None, description: s
         cursor.execute(query, params)
         conn.commit()
         
-        return f"✓ Updated transaction {transaction_id}"
+        return f"OK: Updated transaction {transaction_id}"
 
 @mcp.tool()
 def delete_transaction(transaction_id: str) -> str:
@@ -407,7 +407,7 @@ def delete_transaction(transaction_id: str) -> str:
         cursor.execute("DELETE FROM transactions WHERE id = ?", (transaction_id,))
         conn.commit()
         
-        return f"✓ Deleted transaction: {description} (₹{amount:.2f})"
+        return f"OK: Deleted transaction: {description} ({amount:.2f})"
 
 @mcp.tool()
 def set_budget(category: str, monthly_limit: float) -> str:
@@ -449,9 +449,9 @@ def set_budget(category: str, monthly_limit: float) -> str:
         conn.commit()
         
         if converted:
-            return f"✓ Set budget for '{category}': ₹{abs(monthly_limit):,.2f}/month (auto-converted to negative for expense tracking)"
+            return f"OK: Set budget for '{category}': {abs(monthly_limit):,.2f}/month (auto-converted to negative for expense tracking)"
         else:
-            return f"✓ Set budget for '{category}': ₹{abs(monthly_limit):,.2f}/month"
+            return f"OK: Set budget for '{category}': {abs(monthly_limit):,.2f}/month"
 
 @mcp.tool()
 def list_rules() -> List[Dict]:
@@ -493,7 +493,7 @@ def delete_rule(pattern: str) -> str:
         cursor.execute("DELETE FROM rules WHERE pattern = ?", (pattern,))
         conn.commit()
         
-        return f"✓ Deleted rule: '{pattern}' → '{category}'"
+        return f"OK: Deleted rule: '{pattern}' -> '{category}'"
 
 @mcp.tool()
 def find_duplicates(tolerance_days: int = 1, tolerance_amount: float = 1.0) -> List[Dict]:
@@ -601,9 +601,9 @@ def categorize_batch(transaction_ids: List[str], category: str, create_rule: boo
                          (pattern, category, 20))
             conn.commit()
             
-            return f"✓ Categorized {updated_count} transactions as '{category}' and created rule: '{pattern}' → '{category}'"
+            return f"OK: Categorized {updated_count} transactions as '{category}' and created rule: '{pattern}' -> '{category}'"
         
-        return f"✓ Categorized {updated_count} transactions as '{category}'"
+        return f"OK: Categorized {updated_count} transactions as '{category}'"
 
 @mcp.tool()
 def get_category_trend(category: str, months: int = 6) -> List[Dict]:
@@ -679,7 +679,7 @@ def generate_monthly_report(month: int, year: int) -> str:
         generator = ReportGenerator()
         pdf_path = generator.generate_pdf(month, year)
         
-        return f"✓ Report generated successfully: {pdf_path}\nYou can open this file to view charts and detailed analysis."
+        return f"OK: Report generated successfully: {pdf_path}\nYou can open this file to view charts and detailed analysis."
         
     except ImportError:
         return "Error: Required libraries (reportlab, matplotlib) are missing. Please install them to use this feature."
@@ -775,7 +775,7 @@ def smart_categorize_uncategorized(max_transactions: int = 10, auto_create_rules
     
     for txn in uncategorized:
         amount_rupees = txn['amount'] / 100.0
-        summary += f"- ID: {txn['id']}, Description: {txn['description']}, Amount: ₹{amount_rupees:.2f}\n"
+        summary += f"- ID: {txn['id']}, Description: {txn['description']}, Amount: {amount_rupees:.2f}\n"
     
     # Return instructions for user to paste into Claude
     return f"""

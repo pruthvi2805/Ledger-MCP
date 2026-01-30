@@ -13,6 +13,7 @@ from ledger_mcp.core.security import Security
 from ledger_mcp.core.categorizer import Categorizer
 from ledger_mcp.parsers.csv_parser import CSVParser
 from ledger_mcp.parsers.pdf_parser import PDFParser
+from ledger_mcp.core.report_generator import ReportGenerator
 
 app = typer.Typer(help="Ledger MCP: Local-first Finance CLI")
 
@@ -111,6 +112,34 @@ def detect_recurring():
     categorizer = Categorizer()
     count = categorizer.detect_recurring()
     print(f"Flagged {count} recurring transaction groups.")
+
+@app.command()
+def report(month: int = typer.Option(..., "--month", "-m", help="Month (1-12)"), 
+           year: int = typer.Option(..., "--year", "-y", help="Year (e.g. 2025)")):
+    """Generate a PDF financial report."""
+    print(f"Generating report for {month}/{year}...")
+    
+    try:
+        generator = ReportGenerator()
+        output_path = generator.generate_pdf(month, year)
+        print(f"Report generated successfully: {output_path}")
+        
+        # Try to open the file automatically
+        if os.name == 'nt':
+            os.startfile(output_path)
+        elif os.name == 'posix':
+            # Check for macOS ('open') vs Linux ('xdg-open')
+            import subprocess
+            if sys.platform == "darwin":
+                subprocess.call(('open', output_path))
+            else:
+                subprocess.call(('xdg-open', output_path))
+                
+    except ImportError as e:
+        print(f"Error: {e}")
+        print("Please install report requirements: pip install reportlab matplotlib")
+    except Exception as e:
+        print(f"Failed to generate report: {e}")
 
 @app.command()
 def config(key: str, value: str):

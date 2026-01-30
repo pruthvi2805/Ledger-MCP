@@ -560,9 +560,19 @@ def get_category_trend(category: str, months: int = 6) -> List[Dict]:
     with DB.get_connection() as conn:
         cursor = conn.cursor()
         
-        # Calculate date range - use current date and go back
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=months * 31)  # Use 31 days per month for safety
+        # Get the most recent transaction date for this category
+        cursor.execute("""
+            SELECT MAX(date) FROM transactions WHERE category = ?
+        """, (category,))
+        max_date_row = cursor.fetchone()
+        
+        if not max_date_row or not max_date_row[0]:
+            return []
+        
+        # Use the most recent transaction date as the end date
+        # This ensures we capture data even if it's historical
+        end_date = datetime.strptime(max_date_row[0], "%Y-%m-%d")
+        start_date = end_date - timedelta(days=months * 31)
         
         # Format dates as strings for SQLite
         start_str = start_date.strftime("%Y-%m-%d")

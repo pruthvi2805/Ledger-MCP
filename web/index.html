@@ -40,168 +40,155 @@
             font-family: 'Inter', sans-serif;
             background-color: #050505;
             color: #e5e5e5;
-        }
 
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: #050505;
+                color: #e5e5e5;
+            }
 
-        .ascii-art {
-            line-height: 1.05;
-            /* Tweak for block char alignment */
-            white-space: pre;
-            overflow-x: auto;
-            display: inline-block;
-            font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
-        }
+            .font-mono {
+                font-family: 'JetBrains Mono', monospace;
+            }
 
-        .bg-grid {
-            background-image: linear-gradient(to right, #262626 1px, transparent 1px),
-                linear-gradient(to bottom, #262626 1px, transparent 1px);
-            background-size: 40px 40px;
-            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-        }
+            .bg-grid {
+                background-image: linear-gradient(to right, #262626 1px, transparent 1px),
+                    linear-gradient(to bottom, #262626 1px, transparent 1px);
+                background-size: 40px 40px;
+                mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            }
     </style>
 </head>
 
-<body class="antialiased min-h-screen flex flex-col relative">
+<body class="antialiased h-screen flex flex-col relative overflow-hidden">
 
     <!-- Subtle Background Grid -->
     <div class="fixed inset-0 bg-grid opacity-[0.15] pointer-events-none z-0"></div>
 
     <!-- Navbar -->
-    <nav class="border-b border-white/10 bg-black/50 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+    <nav class="border-b border-white/10 bg-black/50 backdrop-blur fixed top-0 w-full z-50 h-14">
+        <div class="max-w-7xl mx-auto px-6 h-full">
+            <div class="flex items-center justify-between h-full">
                 <div class="flex items-center gap-3">
                     <div class="w-2 h-2 rounded-full bg-brand-500"></div>
-                    <span class="font-bold font-mono text-gray-200 tracking-tight">Ledger MCP</span>
+                    <span class="font-bold font-mono text-gray-200 tracking-tight text-sm">Ledger MCP</span>
                 </div>
-                <!-- Navbar links removed for cleaner look, available in footer -->
+                <!-- Navbar links removed -->
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <main class="flex-grow relative z-10 flex flex-col justify-center pt-10 pb-20">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 w-full">
+    <!-- Main Content (Centered in Viewport) -->
+    <main class="flex-grow relative z-10 flex items-center justify-center pt-14 pb-12 h-full">
+        <div class="max-w-7xl mx-auto px-6 w-full">
 
-            <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
 
                 <!-- Left Content -->
                 <div class="text-left">
                     <div
-                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs font-mono mb-8 font-medium">
-                        <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+                        class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-[10px] font-mono mb-6 font-medium">
+                        <span class="w-1 h-1 rounded-full bg-brand-500 animate-pulse"></span>
                         v1.0.0 Stable
                     </div>
 
-                    <h1 class="text-5xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-tight">
+                    <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 leading-tight">
                         Your Finances, <br />
                         <span class="text-brand-500">Local & Intelligent.</span>
                     </h1>
 
-                    <p class="text-lg text-gray-400 mb-10 max-w-lg leading-relaxed">
+                    <p class="text-base text-gray-400 mb-8 max-w-md leading-relaxed">
                         Transform bank statements into a conversational database.
-                        No cloud servers. No API fees. Complete privacy for your financial life.
+                        No cloud servers. No API fees. 100% Privacy.
                     </p>
 
                     <div class="flex flex-wrap gap-4">
                         <a href="https://github.com/pruthvi2805/Ledger-MCP"
-                            class="bg-white text-black hover:bg-gray-200 px-8 py-3.5 rounded-lg font-bold transition flex items-center gap-2 group">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            class="bg-white text-black hover:bg-gray-200 px-6 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 group">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                             </svg>
                             Star on GitHub
-                            <span class="group-hover:translate-x-0.5 transition-transform">→</span>
                         </a>
                         <div
-                            class="flex items-center gap-2 px-6 py-3.5 rounded-lg border border-white/10 text-gray-400 font-mono text-sm bg-white/5">
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/10 text-gray-400 font-mono text-xs bg-white/5">
                             <span class="text-brand-500">$</span> pip install ledger-mcp
                         </div>
                     </div>
+
+                    <div class="grid grid-cols-3 gap-4 mt-10 border-t border-white/5 pt-6">
+                        <div>
+                            <div class="text-white font-bold text-sm">100% Local</div>
+                            <div class="text-gray-500 text-xs">SQLite Based</div>
+                        </div>
+                        <div>
+                            <div class="text-white font-bold text-sm">Universal</div>
+                            <div class="text-gray-500 text-xs">PDF & CSV</div>
+                        </div>
+                        <div>
+                            <div class="text-white font-bold text-sm">AI Ready</div>
+                            <div class="text-gray-500 text-xs">MCP Native</div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Right Content: ASCII Art -->
-                <div class="hidden lg:flex justify-end opacity-90">
-                    <div class="bg-black/40 p-8 rounded-2xl border border-white/5 backdrop-blur-sm">
-                        <div class="font-mono text-[10px] xl:text-xs text-brand-500 ascii-art">
-                            ██╗ ███████╗██████╗ ██████╗ ███████╗██████╗
-                            ██║ ██╔════╝██╔══██╗██╔════╝ ██╔════╝██╔══██╗
-                            ██║ █████╗ ██║ ██║██║ ███╗█████╗ ██████╔╝
-                            ██║ ██╔══╝ ██║ ██║██║ ██║██╔══╝ ██╔══██╗
-                            ███████╗███████╗██████╔╝╚██████╔╝███████╗██║ ██║
-                            ╚══════╝╚══════╝╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═╝
+                <!-- Right Content: Terminal Demo -->
+                <div class="hidden lg:block">
+                    <div
+                        class="bg-[#0A0A0A] rounded-xl border border-white/10 shadow-2xl overflow-hidden font-mono text-xs leading-relaxed">
+                        <div class="flex items-center gap-1.5 px-4 py-3 bg-white/5 border-b border-white/5">
+                            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
                         </div>
-                        <div class="mt-6 space-y-2 font-mono text-sm text-gray-400 border-t border-white/10 pt-4">
-                            <div class="flex justify-between">
-                                <span>Status_</span>
-                                <span class="text-green-400">Online</span>
+                        <div class="p-6 space-y-4 text-gray-300">
+                            <div class="flex">
+                                <span class="text-brand-500 mr-2">➜</span>
+                                <span>ledger ingest statement.pdf --currency=EUR</span>
                             </div>
-                            <div class="flex justify-between">
-                                <span>Context_</span>
-                                <span class="text-blue-400">Localhost:8000</span>
+                            <div class="text-gray-500">
+                                Parsing PDF structure... <span class="text-brand-500">Done</span><br />
+                                Detecting currency... <span class="text-white">EUR (€)</span><br />
+                                Extracting transactions... <span class="text-white">555 found</span>
                             </div>
-                            <div class="flex justify-between">
-                                <span>Security_</span>
-                                <span class="text-purple-400">Encrypted</span>
+                            <div class="flex mt-4">
+                                <span class="text-brand-500 mr-2">➜</span>
+                                <span>ledger report --month=06</span>
+                            </div>
+                            <div class="text-gray-500">
+                                Generating financial report...<br />
+                                <span class="text-yellow-400">⚠ Uber Eats</span> (Food) exceeded budget by 12%<br />
+                                <span class="text-brand-500">✔ Savings</span> on track (15% of income)
+                            </div>
+                            <div class="flex mt-2 items-center">
+                                <span class="text-brand-500 mr-2">➜</span>
+                                <span class="w-2 h-4 bg-gray-600 animate-pulse"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
             </div>
-
-            <!-- Features Grid -->
-            <div class="grid md:grid-cols-3 gap-6 mt-32">
-                <div class="p-8 bg-white/5 rounded-xl border border-white/5 hover:border-brand-500/30 transition group">
-                    <div
-                        class="w-12 h-12 bg-black rounded-lg border border-white/10 flex items-center justify-center mb-6 text-xl group-hover:scale-110 transition">
-                        🔒</div>
-                    <h3 class="text-lg font-bold mb-3 text-white">Privacy by Architecture</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">No cloud syncing. Your financial data lives
-                        effectively in a SQLite database on your own disk.</p>
-                </div>
-                <div class="p-8 bg-white/5 rounded-xl border border-white/5 hover:border-brand-500/30 transition group">
-                    <div
-                        class="w-12 h-12 bg-black rounded-lg border border-white/10 flex items-center justify-center mb-6 text-xl group-hover:scale-110 transition">
-                        🌍</div>
-                    <h3 class="text-lg font-bold mb-3 text-white">Universal Support</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">Parses statements from HDFC, Chase, ING, or any
-                        regional bank. Handles EUR, USD, and INR natively.</p>
-                </div>
-                <div class="p-8 bg-white/5 rounded-xl border border-white/5 hover:border-brand-500/30 transition group">
-                    <div
-                        class="w-12 h-12 bg-black rounded-lg border border-white/10 flex items-center justify-center mb-6 text-xl group-hover:scale-110 transition">
-                        🧠</div>
-                    <h3 class="text-lg font-bold mb-3 text-white">Context Protocol</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">Built for Claude Desktop & Custom Agents. Provide
-                        your AI with financial context instantly.</p>
-                </div>
-            </div>
-
         </div>
     </main>
 
-
     <!-- Footer -->
-    <footer class="border-t border-dark-700 bg-white py-6">
-        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
+    <footer class="absolute bottom-0 w-full border-t border-white/5 bg-[#050505] py-4">
+        <div class="max-w-7xl mx-auto px-6 text-center text-xs text-gray-500">
             <span>&copy; 2026 Pruthvi Kauticwar</span>
-            <span class="mx-2">&middot;</span>
-            <a href="https://kpruthvi.com" class="hover:text-gray-900 transition">kpruthvi.com</a>
-            <span class="mx-2">&middot;</span>
-            <a href="https://kpruthvi.com/privacy" class="hover:text-gray-900 transition">Privacy</a>
-            <span class="mx-2">&middot;</span>
-            <a href="https://github.com/pruthvi2805" class="hover:text-gray-900 transition">GitHub</a>
-            <span class="mx-2">&middot;</span>
-            <a href="https://www.kpruthvi.com/contact" class="hover:text-gray-900 transition">Contact</a>
+            <span class="mx-2 text-gray-700">&middot;</span>
+            <a href="https://kpruthvi.com" class="hover:text-gray-300 transition">kpruthvi.com</a>
+            <span class="mx-2 text-gray-700">&middot;</span>
+            <a href="https://kpruthvi.com/privacy" class="hover:text-gray-300 transition">Privacy</a>
+            <span class="mx-2 text-gray-700">&middot;</span>
+            <a href="https://github.com/pruthvi2805" class="hover:text-gray-300 transition">GitHub</a>
+            <span class="mx-2 text-gray-700">&middot;</span>
+            <a href="https://www.kpruthvi.com/contact" class="hover:text-gray-300 transition">Contact</a>
         </div>
     </footer>
 
 </body>
 
-</html>
 ```

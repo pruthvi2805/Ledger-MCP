@@ -136,8 +136,16 @@ def get_budget_status(month: int, year: int) -> str:
     if not targets:
         return "No budget targets set."
 
-    # 2. Fetch Actuals
-    actuals = get_monthly_summary(month, year)
+    # 2. Fetch Actuals (multi-currency format: {"Food": {"INR": -5000, "EUR": -20}, ...})
+    actuals_raw = get_monthly_summary(month, year)
+    
+    # Flatten to single value per category (sum all currencies)
+    actuals = {}
+    for cat, currency_dict in actuals_raw.items():
+        if isinstance(currency_dict, dict):
+            actuals[cat] = sum(currency_dict.values())
+        else:
+            actuals[cat] = currency_dict
     
     # 3. Compare - FIXED: Use absolute values for comparison
     report = []

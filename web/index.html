@@ -47,11 +47,12 @@
         }
 
         .ascii-art {
-            line-height: 1.15;
-            /* Fixed for block characters */
+            line-height: 1.05;
+            /* Tweak for block char alignment */
             white-space: pre;
             overflow-x: auto;
             display: inline-block;
+            font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
         }
 
         .bg-grid {
@@ -77,10 +78,7 @@
                     <div class="w-2 h-2 rounded-full bg-brand-500"></div>
                     <span class="font-bold font-mono text-gray-200 tracking-tight">Ledger MCP</span>
                 </div>
-                <div class="flex gap-6 text-sm font-medium text-gray-400">
-                    <a href="https://kpruthvi.com" class="hover:text-white transition">kpruthvi.com</a>
-                    <a href="https://github.com/pruthvi2805/Ledger-MCP" class="hover:text-white transition">GitHub</a>
-                </div>
+                <!-- Navbar links removed for cleaner look, available in footer -->
             </div>
         </div>
     </nav>
@@ -189,18 +187,21 @@
 
 
     <!-- Footer -->
-    <footer class="border-t border-dark-700 py-12 bg-dark-900">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-gray-500 mb-6 font-mono text-sm">Built with care by <a href="https://kpruthvi.com"
-                    class="text-brand-500 hover:underline">Pruthvi Kauticwar</a></p>
-            <div class="flex justify-center gap-4">
-                <a href="https://github.com/pruthvi2805/Ledger-MCP"
-                    class="text-gray-400 hover:text-white transition">GitHub</a>
-                <a href="https://twitter.com/kpruthvi" class="text-gray-400 hover:text-white transition">Twitter</a>
-            </div>
+    <footer class="border-t border-dark-700 bg-white py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
+            <span>&copy; 2026 Pruthvi Kauticwar</span>
+            <span class="mx-2">&middot;</span>
+            <a href="https://kpruthvi.com" class="hover:text-gray-900 transition">kpruthvi.com</a>
+            <span class="mx-2">&middot;</span>
+            <a href="https://kpruthvi.com/privacy" class="hover:text-gray-900 transition">Privacy</a>
+            <span class="mx-2">&middot;</span>
+            <a href="https://github.com/pruthvi2805" class="hover:text-gray-900 transition">GitHub</a>
+            <span class="mx-2">&middot;</span>
+            <a href="https://www.kpruthvi.com/contact" class="hover:text-gray-900 transition">Contact</a>
         </div>
     </footer>
 
 </body>
 
 </html>
+```

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ledger-mcp.kpruthvi.com/sitemap.xml

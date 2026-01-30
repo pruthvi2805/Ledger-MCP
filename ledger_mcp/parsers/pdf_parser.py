@@ -21,7 +21,8 @@ class PDFParser(BaseParser):
                 elif bank == 'SBI':
                     return self._parse_sbi(pdf)
                 else:
-                    raise ValueError("Unknown bank format")
+                    print(f"Bank format not recognized. Attempting Universal Parser...")
+                    return self._parse_universal(pdf)
                     
         except Exception as e:
             if "password" in str(e).lower():
@@ -142,10 +143,120 @@ class PDFParser(BaseParser):
         
         return transactions
 
+    def _parse_universal(self, pdf) -> List[TransactionData]:
+        """
+        Universal fallback parser. Scans tables for consistent date/amount pattern.
+        """
+        transactions = []
+        
+        # Heuristics:
+        # 1. Look for a Date column (DD/MM/YYYY or YYYY-MM-DD)
+        # 2. Look for Amount column(s) - Debit/Credit or single Amount
+        # 3. Description is usually the longest text column
+        
+        for page in pdf.pages:
+            tables = page.extract_tables()
+            for table in tables:
+                if not table: continue
+                
+                # Analyze Header / First few rows to identify indices
+                date_idx = -1
+                desc_idx = -1
+                amount_indices = [] # Could be multiple (Debit, Credit) or single (Amount)
+                
+                # Check first 5 rows to find date column
+                for col_idx in range(len(table[0])):
+                    matches = 0
+                    for row in table[:10]: # Check first 10 rows
+                        if col_idx < len(row) and self._parse_date(row[col_idx]):
+                            matches += 1
+                    if matches >= 3: # If at least 3 rows have dates in this column, it's the date col
+                        date_idx = col_idx
+                        break
+                
+                if date_idx == -1: continue # No date column found, skip table
+                
+                # Identify other columns based on heuristics
+                # Identify numeric columns
+                numeric_cols = []
+                for col_idx in range(len(table[0])):
+                     if col_idx == date_idx: continue
+                     is_numeric = 0
+                     for row in table[:10]:
+                         if col_idx < len(row) and self._is_numeric(row[col_idx]):
+                             is_numeric += 1
+                     if is_numeric >= 3:
+                         numeric_cols.append(col_idx)
+
+                amount_indices = numeric_cols
+                
+                # Description: Longest average length column that is not Date or Amount
+                max_len = 0
+                for col_idx in range(len(table[0])):
+                    if col_idx == date_idx or col_idx in amount_indices: continue
+                    avg_len = sum([len(str(r[col_idx])) for r in table[:10] if col_idx < len(r)]) / 10
+                    if avg_len > max_len:
+                        max_len = avg_len
+                        desc_idx = col_idx
+
+                # Parse rows with identified indices
+                for row in table:
+                    if len(row) <= max(date_idx, desc_idx, max(amount_indices) if amount_indices else 0): continue
+                    
+                    date_str = self._parse_date(row[date_idx])
+                    if not date_str: continue
+                    
+                    desc = row[desc_idx] if desc_idx != -1 else "Unknown Transaction"
+                    
+                    # Determine amount logic
+                    # If 2 numeric cols: Assume Debit, Credit
+                    # If 1 numeric col: Assume +/- Amount or just Amount
+                    amount = 0.0
+                    
+                    if len(amount_indices) >= 2:
+                        debit = self._parse_amount(row[amount_indices[0]])
+                        credit = self._parse_amount(row[amount_indices[1]])
+                        if debit > 0: amount = -debit
+                        elif credit > 0: amount = credit
+                    elif len(amount_indices) == 1:
+                        val = self._parse_amount(row[amount_indices[0]])
+                        # If simple Amount column, heuristic: usually expense if no CR/DR flag.
+                        # Can't guess sign easily. defaulting to negative (expense) for now as typical statement view? 
+                        # Or check for 'Cr' 'Dr' suffix? 
+                        # Let's assume negative if not specified, usually standard for CC statements.
+                        amount = -abs(val) 
+                        
+                    if amount == 0: continue
+                    
+                    transactions.append(TransactionData(
+                        date=date_str,
+                        amount=int(round(amount * 100)),
+                        description=desc
+                    ))
+                    
+        return transactions
+
+    def _is_numeric(self, raw: Any) -> bool:
+        if not raw: return False
+        # Remove common currency symbols and separators
+        s = str(raw).replace(',', '').replace('.', '').replace(' ', '').replace('€', '').replace('$', '').replace('₹', '').strip()
+        # Handle Cr/Dr signs
+        s = s.replace('Cr', '').replace('Dr', '').replace('CR', '').replace('DR', '').strip()
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+
     def _parse_date(self, raw: str) -> Optional[str]:
         if not raw: return None
         raw = str(raw).strip()
-        for fmt in ["%d/%m/%Y", "%d-%m-%Y", "%d %b %Y"]:
+        # Common formats: DD-MM-YYYY, DD/MM/YYYY, DD.MM.YY
+        formats = [
+            "%d/%m/%Y", "%d-%m-%Y", "%d.%m.%Y", 
+            "%d %b %Y", "%Y-%m-%d", "%d.%m.%y"
+        ]
+        for fmt in formats:
             try:
                 return datetime.strptime(raw, fmt).strftime("%Y-%m-%d")
             except ValueError:
@@ -154,8 +265,33 @@ class PDFParser(BaseParser):
 
     def _parse_amount(self, raw: Any) -> float:
         if not raw: return 0.0
-        s = str(raw).replace(',', '').replace(' ', '').strip()
+        s = str(raw).strip()
+        
+        # Handle Cr/Dr suffixes commonly found in PDFs
+        multiplier = 1.0
+        if s.upper().endswith(" DR") or s.upper().endswith("DR"):
+            multiplier = -1.0
+        elif s.upper().endswith(" CR") or s.upper().endswith("CR"):
+            multiplier = 1.0
+            
+        # Clean currency symbols and text
+        s = re.sub(r'[^\d.,-]', '', s)
+        if not s: return 0.0
+        
         try:
-            return float(s)
+            # Heuristic for Decimal Separator
+            # If comma is after the last dot (1.234,56) -> comma is decimal
+            # If dot is after the last comma (1,234.56) -> dot is decimal
+            last_comma = s.rfind(',')
+            last_dot = s.rfind('.')
+            
+            if last_comma > last_dot:
+                # Format: 1.234,56 (EU)
+                s = s.replace('.', '').replace(',', '.')
+            else:
+                # Format: 1,234.56 (US/UK/India)
+                s = s.replace(',', '')
+                
+            return float(s) * multiplier
         except ValueError:
             return 0.0
